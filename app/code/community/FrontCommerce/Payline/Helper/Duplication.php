@@ -10,6 +10,9 @@ class FrontCommerce_Payline_Helper_Duplication
   const STATUS_PENDING = "pending";
   const STATUS_ERROR = "error";
 
+  /** Front-Commerce route the Payline widget returns to (relative to the store base URL). */
+  const WIDGET_PROCESS_PATH = '/payline/process/widget';
+
   /**
    * Source: Monext_Payline_Helper_Widget::getDataToken()
    */
@@ -42,8 +45,10 @@ class FrontCommerce_Payline_Helper_Duplication
       $fcBaseUrl = $this->__getStoreUrl();
 
       $paylineSDK = Mage::helper('payline')->initPayline('CPT', $array['payment']['currency']);
-      $paylineSDK->returnURL          = $fcBaseUrl . '/payline/process/widget';
+      $paylineSDK->returnURL          = $fcBaseUrl . self::WIDGET_PROCESS_PATH;
       $paylineSDK->cancelURL          = $paylineSDK->returnURL;
+      $array['returnURL'] = $fcBaseUrl . self::WIDGET_PROCESS_PATH;
+      $array['cancelURL'] = $fcBaseUrl . self::WIDGET_PROCESS_PATH;
 
       // WALLET
       // ADD CONTRACT WALLET ARRAY TO $array
