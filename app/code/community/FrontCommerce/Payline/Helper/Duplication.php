@@ -150,6 +150,8 @@ class FrontCommerce_Payline_Helper_Duplication
           'result_code' => $tokenData['result_code']
         ];
       } else {
+        // Failed payment already recorded: give the shopper their cart back.
+        $this->renewQuote($this->order);
         throw new \RuntimeException(Mage::helper('payline')->__('Your payment is refused'));
       }
     }
@@ -258,7 +260,13 @@ class FrontCommerce_Payline_Helper_Duplication
       }
     } else {
       Mage::helper('payline/logger')->log('[cptReturnAction] order ' . $this->order->getIncrementId() . ' : unknown error during update');
+      $this->renewQuote($this->order);
       throw new \RuntimeException($this->order->getIncrementId() . ': unknown error during update');
+    }
+
+    if ($paymentStatus === static::STATUS_ERROR) {
+      // Payment failed: give the shopper their cart back so they can retry.
+      $this->renewQuote($this->order);
     }
 
     $this->order->save();
@@ -353,6 +361,52 @@ class FrontCommerce_Payline_Helper_Duplication
       'quote_id' => $onePage->getQuote()->getId(),
       'order_id' => $onePage->getLastOrderId()
     ];
+  }
+
+  /**
+   * Rebuild the customer's cart after a failed payment.
+   *
+   * Onepage::saveOrder() deactivates the quote, so on a payment error the
+   * shopper would lose their cart. We clone the consumed quote into a fresh
+   * active one (new id, no reserved_order_id so the next attempt does not
+   * collide with the failed order) and re-add the order items to it.
+   *
+   * Source: Monext_Payline fork (FrontCommerce_Payline_Helper_Duplication::renewQuote)
+   *
+   * @param Mage_Sales_Model_Order $order
+   */
+  protected function renewQuote($order)
+  {
+    if (Mage::getSingleton('checkout/session')->getLastRealOrderId()) {
+      if ($lastQuoteId = Mage::getSingleton('checkout/session')->getLastQuoteId()) {
+        $quote = Mage::getModel('sales/quote')->load($lastQuoteId);
+        /** @var Mage_Sales_Model_Quote $newQuote */
+        $newQuote = clone $quote;
+        $newQuote
+          ->setIsActive(true)
+          ->setId(null)
+          ->setReservedOrderId(null)
+          ->save()
+        ;
+
+        $cart = Mage::getSingleton('checkout/cart')->setQuote($newQuote);
+
+        /** @var Mage_Sales_Model_Order_Item $item */
+        foreach ($order->getItemsCollection() as $item) {
+          /** @var Mage_Catalog_Model_Product $product */
+          $product = Mage::getModel('catalog/product')->load($item->getProductId());
+          if ($product->isSalable()) {
+            try {
+              $cart->addOrderItem($item);
+            } catch (Exception $e) {
+              Mage::logException($e);
+            }
+          }
+        }
+
+        $cart->save();
+      }
+    }
   }
 
   /**
