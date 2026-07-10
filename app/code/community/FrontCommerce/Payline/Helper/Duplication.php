@@ -218,7 +218,7 @@ class FrontCommerce_Payline_Helper_Duplication
             '02015', // transaction delegated to partner
             '02016', // Transaction pending by the partner
             '02017', // Transaction pending
-            paylineSDK::ERR_CODE // communication issue between Payline and the store
+            \Payline\PaylineSDK::ERR_CODE // communication issue between Payline and the store
           );
 
           if (!in_array($webPaymentDetails['result']['code'], $pendingCodes)) {
