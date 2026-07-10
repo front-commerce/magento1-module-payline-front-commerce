@@ -346,7 +346,7 @@ class FrontCommerce_Payline_Helper_Duplication
     } catch (Exception $e) {
       //TODO: If payment is done it should be canceled.
       Mage::helper('payline/logger')->log('[cptReturnWidgetAction]  (' . $paylineToken . ') : Exception:  ' . $e->getMessage());
-      $this->_critical($e->getMessage());
+      throw new \RuntimeException($e->getMessage());
     }
 
     return [
