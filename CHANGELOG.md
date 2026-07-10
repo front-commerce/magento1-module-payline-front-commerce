@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.2](https://github.com/front-commerce/magento1-module-payline-front-commerce/compare/1.3.1...1.3.2) (2026-07-10)
+
+
+### Bug Fixes
+
+* **widget:** preserve the customer cart on a failed payment ([defa1be](https://github.com/front-commerce/magento1-module-payline-front-commerce/commit/defa1bead93c73b21ab12535ae25ab538e468b37))
+* **widget:** qualify \Payline\PaylineSDK::ERR_CODE to avoid a fatal ([c4db710](https://github.com/front-commerce/magento1-module-payline-front-commerce/commit/c4db710e90c3d79d9cb410f96b302282dfff1e34))
+* **widget:** send return/cancel URLs in doWebPayment payload ([0ebeecd](https://github.com/front-commerce/magento1-module-payline-front-commerce/commit/0ebeecd4c5c28ff224e78afe0b4d5bd3865818e4))
+* **widget:** throw instead of calling _critical() on the Helper ([6ca5d79](https://github.com/front-commerce/magento1-module-payline-front-commerce/commit/6ca5d79e7bccc7c6ca5d0343bd6da310c4ed1665))
+
 ### [1.3.1](https://github.com/front-commerce/magento1-module-payline-front-commerce/compare/1.3.0...1.3.1) (2021-10-29)
 
 
