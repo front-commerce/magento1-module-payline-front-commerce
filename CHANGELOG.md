@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.3](https://github.com/front-commerce/magento1-module-payline-front-commerce/compare/1.3.2...1.3.3) (2026-11-13)
+
+
+### Bug Fixes
+
+* **widget:** leave a dead order on a refused payment ([f8908ab](https://github.com/front-commerce/magento1-module-payline-front-commerce/commit/f8908abdd0de9d42938bc845d141603a497e19ea))
+
 ### [1.3.2](https://github.com/front-commerce/magento1-module-payline-front-commerce/compare/1.3.1...1.3.2) (2026-07-10)
 
 
