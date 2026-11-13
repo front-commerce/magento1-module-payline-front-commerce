@@ -237,7 +237,7 @@ class FrontCommerce_Payline_Helper_Duplication
             } else {
               $userMessage = Mage::helper('payline')->__('Your payment is refused');
               $failedOrderStatus = Mage::getStoreConfig('payment/payline_common/failed_order_status');
-              $this->order->setState(Mage_Sales_Model_Order::STATE_CANCELED, $failedOrderStatus, $msgLog, false);
+              $this->order->setState(Mage_Sales_Model_Order::STATE_CANCELED, $this->finalCanceledStatus($failedOrderStatus), $msgLog, false);
             }
             $tokenForUpdate->setStatus(2); // KO
             $paymentStatus = static::STATUS_ERROR;
@@ -361,6 +361,30 @@ class FrontCommerce_Payline_Helper_Duplication
       'quote_id' => $onePage->getQuote()->getId(),
       'order_id' => $onePage->getLastOrderId()
     ];
+  }
+
+  /**
+   * Status to apply to an order canceled after a refused payment.
+   *
+   * A refused payment must leave a dead order: the merchant-configured status
+   * (payment/payline_common/failed_order_status) is kept only when it belongs
+   * to the canceled state. Otherwise Magento falls back to the state's default
+   * status: a status like "holded" would make a canceled order look alive to
+   * both the shopper and the merchant.
+   *
+   * @param string|false $configuredStatus
+   * @return string|true true lets Magento pick the default status of the state
+   */
+  private function finalCanceledStatus($configuredStatus)
+  {
+    if ($configuredStatus) {
+      $statuses = Mage::getSingleton('sales/order_config')
+        ->getStateStatuses(Mage_Sales_Model_Order::STATE_CANCELED);
+      if (isset($statuses[$configuredStatus])) {
+        return $configuredStatus;
+      }
+    }
+    return true;
   }
 
   /**
